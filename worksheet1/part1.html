@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+	<script type="text/javascript" src="../common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../common/initShaders.js"></script>
+	<script type="text/javascript" src="../common/MV.js"></script>
+	<script type="text/javascript">
+	window.onload = function init(){
+	
+		canvas = document.getElementById("webgl");
+	
+		gl = WebGLUtils.setupWebGL(canvas);
+	
+		if(!gl){
+			alert("No Webbu Gee Ellu")
+		}
+	
+		gl.viewport(0,0,canvas.width,canvas.height);
+		gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);	
+	
+		render();
+	}
+
+
+	function render(){
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.drawArrays(gl.POINTS,0,numVertices);
+	}
+	
+	</script>
+	
+</head>
+
+<body>
+
+	<canvas id="webgl" width="512" height="512">
+		Your browser does not support webgl
+	</canvas>
+
+</body>
+
+</html>
