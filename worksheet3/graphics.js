@@ -78,7 +78,7 @@ window.onload = function init(){
 			
 		colorCube();	
 		
-		var translation = [0.5,0.5,0.5, 0.0];
+		var translation = [0.0,0.0,0.0,0.0];//= [0.5,0.5,0.5, 0.0];
 		var uTranslation = gl.getUniformLocation(program, "uTranslation");
 		gl.uniform4f(uTranslation, translation[0], translation[1], translation[2], translation[3]);
 		var uniform = gl.getUniform(program, uTranslation);
@@ -101,22 +101,43 @@ window.onload = function init(){
 		gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(vColor);
 		
+		//modelViewMatrix = mat4();
+		
+		var point = vec3(1.0, 2.0, 3.0);
 		var R = mat4();
 		var ctm = mat4();
+		
+		
 		var thetaX = Math.acos(3.0/Math.sqrt(14.0));
 		var thetaY = Math.sqrt(13.0/14.0);
-		var d = vec3(4.0, 5.0, 6.0);
+		
 		R = mult(R, rotateX(thetaX));
 		R = mult(R, rotateY(thetaY));
-		R = mult(R, rotateZ(-45.0));
+		R = mult(R, rotateZ(60.0));
 		R = mult(R, rotateY(-thetaY));
 		R = mult(R, rotateX(-thetaX));
-		ctm = translate(ctm, d);
+		
+		
+		
+		/*
+		ctm = translate(ctm, point)
 		ctm = mult(ctm, R);
-		ctm = translate(ctm, negate(d));
+		ctm = translate(ctm, negate(point));
+		
+		ctm = rotateX(-45.0);*/
+		
+		ctm = mult(R, ctm);
+		
+		console.log(ctm);
+		console.log(R);
+		console.log(translate(ctm, point));
 		
 		var uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
 		gl.uniformMatrix4fv(uModelViewMatrix, false, flatten(ctm));
+		console.log(gl.getUniform(program, uModelViewMatrix));
+		
+		
+		
 		
 			
 		render();
@@ -126,7 +147,7 @@ window.onload = function init(){
 	function render(){		
 		gl.clear(gl.COLOR_BUFFER_BIT);
 		if(index > 0){
-			gl.drawArrays(gl.LINES, 0,index)
+			gl.drawArrays(gl.TRIANGLES, 0,index)
 		}
 		window.requestAnimFrame(render, canvas);
 	}
