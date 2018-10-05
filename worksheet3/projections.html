@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="drawingapp.css">
+
+	<script id="vertex-shader" type="x-shader/x-vertex">
+		precision mediump float;
+	
+		attribute vec4 vPosition;
+		attribute vec4 vColor;
+		varying vec4 fColor;
+		
+		uniform vec4 uTranslation;
+		uniform mat4 uModelViewMatrix;
+		
+		void main(){
+			gl_Position = (vPosition + uTranslation)* uModelViewMatrix;
+			fColor = vColor;
+		}
+	</script>
+	
+	<script id="fragment-shader" type="x-shader/x-fragment">
+		precision mediump float;
+		
+		varying vec4 fColor;
+		
+		void main()
+		{	
+			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+			
+			gl_FragColor = fColor;
+		}
+	</script>
+
+	<script type="text/javascript" src="../common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../common/initShaders.js"></script>
+	<script type="text/javascript" src="../common/MV.js"></script>
+	<script type="text/javascript" src="graphics.js"></script>
+	
+</head>
+
+<body>
+	
+	<canvas id="webgl" width="512" height="512">
+		Your browser does not support webgl
+	</canvas>
+	
+	<button id="ButtonX">Rotate X</button>
+	<button id="ButtonY">Rotate Y</button>
+	<button id="ButtonZ">Rotate Z</button>
+	
+
+</body>
+
+</html>
