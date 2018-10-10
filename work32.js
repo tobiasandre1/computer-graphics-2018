@@ -12,6 +12,12 @@ var iso = mat4(1.732050808/2.449489743,0,-1.732050808/2.449489743,0,
 				0,0,0,1
 				);
 
+
+var twoPoint = mat4(1.0,0,0,(Math.sqrt(2)/2)/1,
+				0,1.0,0,0,
+				0,0,1.0,(Math.sqrt(2)/2)/1,
+				0,0,0,1.0);
+
 window.onload = function init()
 {
 	canvas = document.getElementById("gl-canvas");
@@ -66,26 +72,6 @@ window.onload = function init()
 	gl.enableVertexAttribArray(vPositionLocationId);
 	
 	
-	
-	var colors = [
-vec3(1.0, 0.0, 0.0,1),
-vec3(0.0, 1.0, 0.0,1),
-vec3(0.0, 0.0, 1.0,1)
-];		
-
- colorsArray = [ ];
-for(var ind = 0; ind < 3; ++ind) {
-
-colorsArray.push(colors[ind]);
-}		
-
-var cbuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER,cbuffer);	 
-gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
-
-	
-	fColorLoc = gl.getUniformLocation(program, "fColor");
-	
 
 	
 	var a = document.getElementById("ButtonX")
@@ -111,7 +97,7 @@ gl.bufferData(gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW);
 	modelViewMatrixLoc = gl.getUniformLocation(program,"modelViewMatrix")
 	
 	
-
+	
 render();
 }		
 	
@@ -123,9 +109,10 @@ theta[axis] += 1.0;
 ctm = rotateX(theta[xAxis]);
 ctm = mult(ctm, rotateY(theta[yAxis]));
 ctm = mult(ctm, rotateZ(theta[zAxis]));
+ctm = mult(ctm, twoPoint);
 ctm = mult(ctm, iso);
+
 gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
-gl.uniform4fv(fColorLoc, flatten(colorsArray));
 gl.drawElements(gl.TRIANGLE_STRIP, indices.length,gl.UNSIGNED_BYTE, 0);
 requestAnimFrame(render);
 }
