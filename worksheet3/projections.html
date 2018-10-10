@@ -6,17 +6,14 @@
 
 	<script id="vertex-shader" type="x-shader/x-vertex">
 		precision mediump float;
-	
-		attribute vec4 vPosition;
+		attribute vec3 vPosition;
 		attribute vec4 vColor;
 		varying vec4 fColor;
-		
-		uniform vec4 uTranslation;
-		uniform mat4 uModelViewMatrix;
-		
-		void main(){
-			gl_Position = uModelViewMatrix * (vPosition + uTranslation);
+		uniform mat4 modelViewMatrix;
+		void main()
+		{
 			fColor = vColor;
+			gl_Position = modelViewMatrix * vec4(vPosition,1);
 		}
 	</script>
 	
@@ -46,9 +43,12 @@
 		Your browser does not support webgl
 	</canvas>
 	
-	<button id="ButtonX">Rotate X</button>
-	<button id="ButtonY">Rotate Y</button>
+	
+	<button id="iso">Isometric</button>
+	<button id="pin">Pinhole</button>
+	<!---
 	<button id="ButtonZ">Rotate Z</button>
+	-->
 	
 
 </body>
