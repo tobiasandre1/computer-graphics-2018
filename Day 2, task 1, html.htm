@@ -1,0 +1,74 @@
+<html>
+
+<script id ="vertex-shader" type="x-shader/x-vertex">
+
+precision mediump float;
+attribute vec4 vPosition;
+attribute vec4 vColor;
+varying vec4 fColor;
+void main()
+{
+gl_PointSize = 20.0;
+fColor = vColor;
+gl_Position = vPosition;
+}
+
+
+</script>
+
+
+<script id ="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying vec4 fColor;
+void main()
+{
+gl_FragColor = fColor;
+}
+</script>
+
+
+
+
+
+
+<script type="text/javascript" src="common/webgl-utils.js"></script>
+<script type="text/javascript" src="common/initShaders.js"></script>
+<script type="text/javascript" src="common/MV.js"></script>
+<script type="text/javascript" src="work22.js"></script>
+
+<button id="clearButton">Clear canvas</button>
+<button id="addPoint">Add point</button>
+<button id="addTriangle">Add triangle</button>
+<button id="addCircle">Add circle</button>
+
+
+<select id="mymenu" size="8">
+<option value="0">black</option>
+<option value="1">red</option>
+<option value="2">yellow</option>
+<option value="3">green</option>
+<option value="4">blue</option>
+<option value="5">magenta</option>
+<option value="6">cyan</option>
+<option value="7">white</option>
+</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<body>
+<canvas id="gl-canvas" width="512" height="512">
+
+</canvas>
+</body>
+</html>

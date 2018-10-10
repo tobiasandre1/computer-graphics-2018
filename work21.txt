@@ -1,0 +1,12 @@
+
+
+
+
+
+canvas.addEventListener("click", function() {
+gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+var t = vec2(-1 + 2*event.clientX/canvas.width,
+-1 + 2*(canvas.height-event.clientY)/canvas.height);
+gl.bufferSubData(gl.ARRAY_BUFFER, sizeof[’vec2’]*index, t);
+index++;
+});
