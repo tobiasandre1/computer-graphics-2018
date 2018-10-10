@@ -9,8 +9,13 @@ var iso = mat4(1.732050808/2.449489743,0,-1.732050808/2.449489743,0,
 				0,0,0,1
 				);
 				
-var mvs = [iso, mat4()];
-var selected = 0;
+var twoPoint = mat4(	1.0,0,0,0,
+						0,1.0,0,0,
+						0,0,1.0,0,
+						0,0,1/2.4142,1.0);				
+				
+var mvs = [iso, mult(twoPoint, iso)];
+var selected = 1;
 
 /**
 * @param {Element} canvas. The canvas element to create a context from.
