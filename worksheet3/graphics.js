@@ -8,13 +8,26 @@ var iso = mat4(1.732050808/2.449489743,0,-1.732050808/2.449489743,0,
 				1.414213562/2.449489743,-1.414213562/2.449489743,1.414213562/2.449489743,0,
 				0,0,0,1
 				);
-				
+
+var threePoint = mat4(	0.5,0,0,0,
+						0,0.5,0,0,
+						0,0,0.5,0,
+						0,0,1/2.4142,1.0);					
+	
 var twoPoint = mat4(	1.0,0,0,0,
 						0,1.0,0,0,
-						0,0,1.0,0,
-						0,0,1/2.4142,1.0);				
+						0,1/2.4142,1.0,0,
+						0,0,0,1.0);	
+
+var onePoint = mat4(	1.0,0,0,0,
+						0,1.0,0,0,
+						0,0,0,0,
+						0,0,-0.5,1.0);							
 				
-var mvs = [iso, mult(twoPoint, iso)];
+var mvs = [iso, onePoint, twoPoint, threePoint];
+
+var look, translate, scale, ort, pin, projection;
+
 var selected = 1;
 
 /**
@@ -42,25 +55,25 @@ window.onload = function init(){
 		gl.useProgram(program);
 		
 		vertices = [
-			vec3(-0.5, -0.5, 0.5),
-			vec3(-0.5, 0.5, 0.5),
-			vec3(0.5, 0.5, 0.5),
-			vec3(0.5, -0.5, 0.5),
-			vec3(-0.5, -0.5, -0.5),
-			vec3(-0.5, 0.5, -0.5),
-			vec3(0.5, 0.5, -0.5),
-			vec3(0.5, -0.5, -0.5)
+			vec3(0, 0, 0),
+			vec3(0, 1, 0),
+			vec3(1, 1, 0),
+			vec3(1, 0, 0),
+			vec3(0, 0, 1),
+			vec3(0, 1, 1),
+			vec3(1, 1, 1),
+			vec3(1, 0, 1)
 		];
 		
 		var colors = [
 			0,0,0, 
+			0,1,1, 
+			0,1,1, 
+			0,0,0,
 			0,0,0, 
-			0,1,0, 
-			1,0,1,
-			0,0,1, 
-			1,0,0, 
-			0,1,0, 
-			1,0,1];
+			0,1,1, 
+			0,1,1, 
+			0,0,0];
 		
 		indices = [
 			1, 0, 3,
@@ -108,13 +121,30 @@ window.onload = function init(){
 		gl.enableVertexAttribArray(vColor);
 		
 		document.getElementById("iso").onclick = function(){
-			selected = 0;
+			look = lookAt(vec3(1.5,1.5,1.5), vec3(0,0,0), vec3(0,1,0));
+			projection = mult(ort, look);
 		}
 		
-		document.getElementById("pin").onclick = function(){
-			selected = 1;
+		document.getElementById("one").onclick = function(){
+			look = lookAt(vec3(0.5,0.5,2.0), vec3(0.5,0.5,0.5), vec3(0,1,0));
+			scale = scalem(0.5,0.5,0.5);
+			projection = mult(pin, look);
+			projection = mult(projection, scale);
 		}
 		
+		document.getElementById("two").onclick = function(){
+			selected = 2;
+		}
+		
+		document.getElementById("three").onclick = function(){
+			selected = 3;
+		}
+			
+		ort = ortho(-1.0, 1.0, -1.0, 1.0, 0.01, 1000.0);	
+		look = lookAt(vec3(1.5,1.5,1.5), vec3(0,0,0), vec3(0,1,0));
+		
+		pin = perspective(45.0, canvas.width/canvas.height, 0.01, 1000.0);
+		projection = mult(ort,look);	
 			
 		render();
 	}
@@ -124,9 +154,20 @@ window.onload = function init(){
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
 		ctm = mat4();
-		ctm = mult(ctm, mvs[selected]);
+		ctm = mult(ctm, projection);
 		gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
 		gl.drawElements(gl.TRIANGLE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
+		
+		/*
+		ctm = mult(ctm, mvs[2]);
+		gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
+		gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
+		
+		ctm = mult(ctm, mvs[3]);
+		gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
+		gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);*/
+		
+		
 		requestAnimFrame(render);
 	}
 	
