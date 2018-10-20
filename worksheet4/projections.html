@@ -6,14 +6,14 @@
 
 	<script id="vertex-shader" type="x-shader/x-vertex">
 		precision mediump float;
-		attribute vec3 vPosition;
+		attribute vec4 vPosition;
 		attribute vec4 vColor;
 		varying vec4 fColor;
 		uniform mat4 modelViewMatrix;
 		void main()
 		{
-			fColor = vColor;
-			gl_Position = modelViewMatrix * vec4(vPosition,1);
+			fColor = 0.5*vPosition+0.5;
+			gl_Position = modelViewMatrix * vPosition;
 		}
 	</script>
 	
@@ -25,7 +25,6 @@
 		void main()
 		{	
 			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-			
 			gl_FragColor = fColor;
 		}
 	</script>
@@ -43,14 +42,8 @@
 		Your browser does not support webgl
 	</canvas>
 	
-	
-	<button id="iso">Isometric</button>
-	<button id="one">Classical views</button>
-	<!--<button id="two">Two Point Perspective</button>
-	<button id="three">Three Point Perspective</button>-->
-	
-	<br>
-	TODO: Part 3 descriptions here
+	<input id="inc" type="button" value="Increment Subdivisions"></input>
+	<input id="dec" type="button" value="Decrement Subdivisions"></input>
 	
 
 </body>
