@@ -1,5 +1,37 @@
 var index = 0;
-var modelViewMatrix;
+var theta = 1.0;
+var modelViewMatrix, ctm;
+var indices, vertices;
+
+var iso = mat4(1.732050808/2.449489743,0,-1.732050808/2.449489743,0,
+				1/2.449489743,2/2.449489743,1/2.449489743,0,
+				1.414213562/2.449489743,-1.414213562/2.449489743,1.414213562/2.449489743,0,
+				0,0,0,1
+				);
+
+var threePoint = mat4(	0.5,0,0,0,
+						0,0.5,0,0,
+						0,0,0.5,0,
+						0,0,1/2.4142,1.0);					
+	
+var twoPoint = mat4(	1.0,0,0,0,
+						0,1.0,0,0,
+						0,1/2.4142,1.0,0,
+						0,0,0,1.0);	
+
+var onePoint = mat4(	1.0,0,0,0,
+						0,1.0,0,0,
+						0,0,0,0,
+						0,0,-0.5,1.0);							
+				
+var mvs = [iso, onePoint, twoPoint, threePoint];
+
+var look, translate, scale, ort, pin, projection, temp;
+
+var selected = 1;
+
+var showClassic;
+
 /**
 * @param {Element} canvas. The canvas element to create a context from.
 * @return {WebGLRenderingContext} The created context.
@@ -24,131 +56,145 @@ window.onload = function init(){
 		program = initShaders(gl, "vertex-shader", "fragment-shader");
 		gl.useProgram(program);
 		
-		var points = [];
-		
-		var vertices = [
-			vec4(-0.5, -0.5, 0.5, 1.0),
-			vec4(-0.5, 0.5, 0.5, 1.0),
-			vec4(0.5, 0.5, 0.5, 1.0),
-			vec4(0.5, -0.5, 0.5, 1.0),
-			vec4(-0.5, -0.5, -0.5, 1.0),
-			vec4(-0.5, 0.5, -0.5, 1.0),
-			vec4(0.5, 0.5, -0.5, 1.0),
-			vec4(0.5, -0.5, -0.5, 1.0)
+		vertices = [
+			vec3(0.0, 0.0, 0.0),
+			vec3(0.0, 1.0, 0.0),
+			vec3(1.0, 1.0, 0.0),
+			vec3(1.0, 0.0, 0.0),
+			vec3(0.0, 0.0, 1.0),
+			vec3(0.0, 1.0, 1.0),
+			vec3(1.0, 1.0, 1.0),
+			vec3(1.0, 0.0, 1.0)
 		];
 		
-		var vertexColors = [
-			[ 0.0, 0.0, 0.0, 1.0 ], // black
-			[ 1.0, 0.0, 0.0, 1.0 ], // red
-			[ 1.0, 1.0, 0.0, 1.0 ], // yellow
-			[ 0.0, 1.0, 0.0, 1.0 ], // green
-			[ 0.0, 0.0, 1.0, 1.0 ], // blue
-			[ 1.0, 0.0, 1.0, 1.0 ], // magenta
-			[ 1.0, 1.0, 1.0, 1.0 ], // white
-			[ 0.0, 1.0, 1.0, 1.0 ] // cyan
+		var colors = [
+			0,0,0, 
+			0,1,1, 
+			0,1,1, 
+			0,0,0,
+			0,0,0, 
+			0,1,1, 
+			0,1,1, 
+			0,0,0];
+		
+		indices = [
+			1, 0, 3,
+			3, 2, 1,
+			2, 3, 7,
+			7, 6, 2,
+			3, 0, 4,
+			4, 7, 3,
+			6, 5, 1,
+			1, 2, 6,
+			4, 5, 6,
+			6, 7, 4,
+			5, 4, 0,
+			0, 1, 5
 		];
-		
-		//Faces is a 2-dimensional array of positions, consisting of 24 vertices
-		var faces = new Array(24);
-		
-		var numVertices = 36; //36 because we can only draw triangles, not squares. Therefore each face is 6 vertices
-		var points = [ ]; //2d array for points
-		var colors = [ ]; //2d array for colors
-		
-		function quad(a, b, c, d) //Vertex parameters
-		{
-			var indices = [ a, b, c, a, c, d ]; //Draw two triangles for the face
-			for (var i = 0; i < indices.length; ++i) {
-				points.push(vertices[indices[i]]);
-				colors.push(vertexColors[indices[i]]);
-				index++;
-				
-			}
-		}	
-		
-		function colorCube()
-		{
-			quad(1, 0, 3, 2);
-			quad(2, 3, 7, 6);
-			quad(3, 0, 4, 7);
-			quad(6, 5, 1, 2);
-			quad(4, 5, 6, 7);
-			quad(5, 4, 0, 1);
-		}
-			
-		colorCube();	
-		
-		var translation = [0.0,0.0,0.0,0.0];//= [0.5,0.5,0.5, 0.0];
-		var uTranslation = gl.getUniformLocation(program, "uTranslation");
-		gl.uniform4f(uTranslation, translation[0], translation[1], translation[2], translation[3]);
-		var uniform = gl.getUniform(program, uTranslation);
-		console.log(uniform);
-		
 			
 		var vBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
 		
 		var vPosition = gl.getAttribLocation(program, "vPosition");
-		gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(vPosition);
+		
+		var iBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(indices),gl.STATIC_DRAW);
+		
+		
+		modelViewMatrix = mat4();
+		modelViewMatrix = mult(modelViewMatrix, mat4());
+		
+		var mBuffer = gl.createBuffer();	
+		gl.bindBuffer(gl.ARRAY_BUFFER,mBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, flatten(modelViewMatrix), gl.STATIC_DRAW);
+		
+		modelViewMatrixLoc = gl.getUniformLocation(program,"modelViewMatrix")
 		
 		var cBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 		
 		var vColor = gl.getAttribLocation(program, "vColor");
-		gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+		gl.vertexAttribPointer(vColor, 3, gl.FLOAT, false, 0, 0);
 		gl.enableVertexAttribArray(vColor);
 		
-		//modelViewMatrix = mat4();
+		showClassic = true;
+		ort = ortho(-1.0, 1.0, -1.0, 1.0, 0.01, 1000.0);	
+		pin = perspective(45.0, canvas.width/canvas.height, 0.01, 1000.0);
 		
-		var point = vec3(1.0, 2.0, 3.0);
-		var R = mat4();
-		var ctm = mat4();
+		document.getElementById("iso").onclick = function(){
+			showClassic = false;
+			render();
+		}
 		
-		
-		var thetaX = Math.acos(3.0/Math.sqrt(14.0));
-		var thetaY = Math.sqrt(13.0/14.0);
-		
-		R = mult(R, rotateX(thetaX));
-		R = mult(R, rotateY(thetaY));
-		R = mult(R, rotateZ(60.0));
-		R = mult(R, rotateY(-thetaY));
-		R = mult(R, rotateX(-thetaX));
-		
-		
+		document.getElementById("one").onclick = function(){
+			showClassic = true;
+			render();
+		}
 		
 		/*
-		ctm = translate(ctm, point)
-		ctm = mult(ctm, R);
-		ctm = translate(ctm, negate(point));
+		document.getElementById("two").onclick = function(){
+			selected = 2;
+		}
 		
-		ctm = rotateX(-45.0);*/
-		
-		ctm = mult(R, ctm);
-		
-		console.log(ctm);
-		console.log(R);
-		console.log(translate(ctm, point));
-		
-		var uModelViewMatrix = gl.getUniformLocation(program, "uModelViewMatrix");
-		gl.uniformMatrix4fv(uModelViewMatrix, false, flatten(ctm));
-		console.log(gl.getUniform(program, uModelViewMatrix));
-		
-		
-		
-		
+		document.getElementById("three").onclick = function(){
+			selected = 3;
+		}*/	
 			
 		render();
 	}
 
 
 	function render(){		
-		gl.clear(gl.COLOR_BUFFER_BIT);
-		if(index > 0){
-			gl.drawArrays(gl.TRIANGLES, 0,index)
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		
+		if(showClassic){
+			look = lookAt(vec3(3.0,0.25,0.25), vec3(0.25,0.25,0.25), vec3(0.0,1.0,0.0));
+			scale = scalem(0.5,0.5,0.5);
+			projection = mult(pin, look);
+			projection = mult(projection, scale);
+			
+			ctm = mat4();
+			ctm = mult(ctm, projection);
+			gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
+			gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
+			
+			temp = projection;
+			projection = mult(projection, translate(0.0, 0.0, 1.5));
+			projection = mult(projection, rotateY(45.0));
+			
+			
+			ctm = mat4();
+			ctm = mult(ctm, projection);
+			gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
+			gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
+			
+			projection = temp;
+			projection = mult(projection, translate(0.0, 0.0, -2.0));
+			projection = mult(projection, rotateY(45.0));
+			projection = mult(projection, rotateZ(45.0));
+			projection = mult(projection, translate(-0.7, 0.2, 0.0));
+			
+			ctm = mat4();
+			ctm = mult(ctm, projection);
+			gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
+			gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
+			
+			
+		} else {
+			look = lookAt(vec3(1.5,1.5,1.5), vec3(0.0,0.0,0.0), vec3(0.0,1.0,0.0));
+			projection = mult(ort, look);
+			
+			ctm = mat4();
+			ctm = mult(ctm, projection);
+			gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
+			gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 		}
-		window.requestAnimFrame(render, canvas);
+		
+		requestAnimFrame(render);
 	}
 	
