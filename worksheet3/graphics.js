@@ -195,18 +195,6 @@ window.onload = function init(){
 			gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
 		}
 		
-	
-		
-		/*
-		ctm = mult(ctm, mvs[2]);
-		gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
-		gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);
-		
-		ctm = mult(ctm, mvs[3]);
-		gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
-		gl.drawElements(gl.LINE_STRIP, indices.length, gl.UNSIGNED_BYTE, 0);*/
-		
-		
 		requestAnimFrame(render);
 	}
 	
