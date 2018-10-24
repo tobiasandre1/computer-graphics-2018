@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<!--<link rel="stylesheet" type="text/css" href="drawingapp.css">-->
+
+	<script id="vertex-shader" type="x-shader/x-vertex">
+		precision mediump float;
+		attribute vec4 vPosition;
+		attribute vec4 vNormal;
+		attribute vec4 vColor;
+		varying vec4 fColor;
+		varying vec4 fNormal;
+		
+		uniform mat4 modelViewMatrix;
+		uniform vec4 lightpos;
+		
+		void main()
+		{
+			fColor = 0.5*vPosition+0.5;
+			gl_Position = modelViewMatrix * vPosition;
+			fNormal = vNormal;
+		}
+	</script>
+	
+	<script id="fragment-shader" type="x-shader/x-fragment">
+		precision mediump float;
+		
+		varying vec4 fColor;
+		varying vec4 fNormal;
+		
+		void main()
+		{	
+			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+			//forskel mellem garoud og phong er om man laver beregning i vertex eller fragment shader og renormaliserer normaler
+			//vec4 n = normalize(fNormal);
+			vec4 n = fNormal;
+			vec4 le = vec4(0.0,0.0,-1.0,0.0);
+		
+			gl_FragColor = fColor*dot(-le,n);
+			gl_FragColor.a = 1.0;
+			
+			
+			
+		}
+	</script>
+
+	<script type="text/javascript" src="../common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../common/initShaders.js"></script>
+	<script type="text/javascript" src="../common/MV.js"></script>
+	<script type="text/javascript" src="part3.js"></script>
+	
+</head>
+
+<body>
+	
+	<canvas id="webgl" width="512" height="512">
+		Your browser does not support webgl
+	</canvas>
+	
+	<input id="inc" type="button" value="Increment Subdivisions"></input>
+	<input id="dec" type="button" value="Decrement Subdivisions"></input>
+	
+
+</body>
+
+</html>
