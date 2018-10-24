@@ -2,6 +2,8 @@ var modelViewMatrix, ctm;
 var vertices, pointsArray, normalsArray;
 var subs;
 var look, translate, scale, ort, pin, projection, temp;
+var kd, ka, ks, a, le;
+var slider;
 
 var selected = 1;
 
@@ -69,18 +71,6 @@ window.onload = function init(){
 		
 		ort = ortho(-1.0, 1.0, -1.0, 1.0, 0.01, 1000.0);	
 		pin = perspective(45.0, canvas.width/canvas.height, 0.01, 1000.0);
-			
-		//Lighting	
-		/*
-		var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0);
-		var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
-		var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);*/	
-		
-		//diffuse 
-		
-		var lightIntensity = vec4(1.0, 1.0, 1.0, 1.0);
-		//var reflectionCoef
-		var lightPosition = vec4(0.0, 0.0, -1.0, 0.0);
 		
 		document.getElementById("inc").addEventListener("mousedown", function() {
 			if(subs<10){
@@ -102,7 +92,27 @@ window.onload = function init(){
 			restart(vBuffer, vNBuffer);
 		});
 		
+		document.getElementById("kd").addEventListener("input", function(){
+			kd = document.getElementById("kd").value/100;
+		});
+		
+		document.getElementById("ka").addEventListener("input", function(){
+			ka = document.getElementById("ka").value/100;
+		});
 			
+		document.getElementById("ks").addEventListener("input", function(){
+			ks = document.getElementById("ks").value/100;
+		});
+		
+		document.getElementById("a").addEventListener("input", function(){
+			a = document.getElementById("a").value;
+		});
+		
+		document.getElementById("le").addEventListener("input", function(){
+			le = document.getElementById("le").value;
+		});
+
+		
 		render();
 	}
 
@@ -115,7 +125,7 @@ window.onload = function init(){
 			normalsArray.push(vec4(a[0], a[1], a[2], 0.0));
 			normalsArray.push(vec4(b[0], b[1], b[2], 0.0));
 			normalsArray.push(vec4(c[0], c[1], c[2], 0.0));
-		}
+	}
 		
 	function divideTriangle(a, b, c, count)
 	{
@@ -147,6 +157,10 @@ window.onload = function init(){
 		
 		gl.bindBuffer(gl.ARRAY_BUFFER, vNBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
+	}
+	
+	function sendcoefficients(){
+		
 	}
 
 	var theta = 0.0;

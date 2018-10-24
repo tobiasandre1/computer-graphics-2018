@@ -9,17 +9,28 @@
 		attribute vec4 vPosition;
 		attribute vec4 vNormal;
 		attribute vec4 vColor;
+		
 		varying vec4 fColor;
 		varying vec4 fNormal;
+		varying vec4 le;
+		varying vec4 kd;
+		varying vec4 ka;
+		varying vec4 ks;
+		varying vec4 a;
 		
 		uniform mat4 modelViewMatrix;
-		uniform vec4 lightpos;
+		uniform float ale;
+		uniform float akd;
+		uniform float aka;
+		uniform float aks;
+		uniform float aa;
 		
 		void main()
 		{
 			fColor = 0.5*vPosition+0.5;
 			gl_Position = modelViewMatrix * vPosition;
 			fNormal = vNormal;
+			le = vec4(0.0,0.0,-1.0,0.0);
 		}
 	</script>
 	
@@ -28,17 +39,20 @@
 		
 		varying vec4 fColor;
 		varying vec4 fNormal;
+		varying vec4 le;
+		varying vec4 kd;
+		varying vec4 ka;
+		varying vec4 ks;
+		varying vec4 a;
 		
 		void main()
 		{	
 			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 			//forskel mellem garoud og phong er om man laver beregning i vertex eller fragment shader og renormaliserer normaler
-			//vec4 n = normalize(fNormal);
-			vec4 n = fNormal;
-			vec4 le = vec4(0.0,0.0,-1.0,0.0);
+			vec4 n = normalize(fNormal);
+			//vec4 n = fNormal;
 		
 			gl_FragColor = fColor*dot(-le,n);
-			//move things about to vertex shader
 			gl_FragColor.a = 1.0;
 			
 			
@@ -49,7 +63,7 @@
 	<script type="text/javascript" src="../common/webgl-utils.js"></script>
 	<script type="text/javascript" src="../common/initShaders.js"></script>
 	<script type="text/javascript" src="../common/MV.js"></script>
-	<script type="text/javascript" src="part3.js"></script>
+	<script type="text/javascript" src="part4.js"></script>
 	
 </head>
 
@@ -58,7 +72,13 @@
 	<canvas id="webgl" width="512" height="512">
 		Your browser does not support webgl
 	</canvas>
-	
+	<br>
+	Ka<input type="range" min="0" max="100" value="10" class="slider" id="ka"></input> 
+	Kd<input type="range" min="0" max="100" value="10" class="slider" id="kd"></input> 
+	Ks<input type="range" min="0" max="100" value="10" class="slider" id="ks"></input> 
+	a<input type="range" min="0.0" max="10.0" value="1.0" class="slider" id="a"></input> 
+	Le<input type="range" min="0.0" max="10.0" value="1.0" class="slider" id="le"></input> 	
+	<br>
 	<input id="inc" type="button" value="Increment Subdivisions"></input>
 	<input id="dec" type="button" value="Decrement Subdivisions"></input>
 	
