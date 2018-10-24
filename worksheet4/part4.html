@@ -13,6 +13,8 @@
 		varying vec4 fColor;
 		varying vec4 fNormal;
 		varying vec4 le;
+		varying vec4 r;
+		varying vec4 eye4;
 		varying vec4 kd;
 		varying vec4 ka;
 		varying vec4 ks;
@@ -24,13 +26,19 @@
 		uniform float aka;
 		uniform float aks;
 		uniform float aa;
+		uniform vec3 eye;
 		
 		void main()
 		{
-			fColor = 0.5*vPosition+0.5;
+			fColor = (0.5*vPosition+0.5);
+			le = vec4(0.0,0.0,-1.0,0.0);
+			eye4 = vec4(eye, 0.0);
+			r = reflect(normalize(-le), normalize(vNormal));
+			fColor = fColor*(ale*aka + ale*akd*max(dot(-le, vNormal), 0.0) + ale*aks*pow(max(dot(r, eye4), 0.0), aa));
+			//v is vector from point p to viever, not viewer position. However, since we are looking at origin, this is the case for this instance
+			
 			gl_Position = modelViewMatrix * vPosition;
 			fNormal = vNormal;
-			le = vec4(0.0,0.0,-1.0,0.0);
 		}
 	</script>
 	
@@ -52,7 +60,7 @@
 			vec4 n = normalize(fNormal);
 			//vec4 n = fNormal;
 		
-			gl_FragColor = fColor*dot(-le,n);
+			gl_FragColor = fColor;
 			gl_FragColor.a = 1.0;
 			
 			
@@ -73,11 +81,11 @@
 		Your browser does not support webgl
 	</canvas>
 	<br>
-	Ka<input type="range" min="0" max="100" value="10" class="slider" id="ka"></input> 
-	Kd<input type="range" min="0" max="100" value="10" class="slider" id="kd"></input> 
-	Ks<input type="range" min="0" max="100" value="10" class="slider" id="ks"></input> 
-	a<input type="range" min="0.0" max="10.0" value="1.0" class="slider" id="a"></input> 
-	Le<input type="range" min="0.0" max="10.0" value="1.0" class="slider" id="le"></input> 	
+	Ka<input type="range" min="0" max="100" value="5" class="slider" id="ka"></input> 
+	Kd<input type="range" min="0" max="100" value="100" class="slider" id="kd"></input> 
+	Ks<input type="range" min="0" max="100" value="100" class="slider" id="ks"></input> 
+	a<input type="range" min="0" max="10" value="1" class="slider" id="a"></input> 
+	Le<input type="range" min="0" max="100" value="10" class="slider" id="le"></input> 	
 	<br>
 	<input id="inc" type="button" value="Increment Subdivisions"></input>
 	<input id="dec" type="button" value="Decrement Subdivisions"></input>

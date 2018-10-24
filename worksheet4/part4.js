@@ -3,9 +3,8 @@ var vertices, pointsArray, normalsArray;
 var subs;
 var look, translate, scale, ort, pin, projection, temp;
 var kd, ka, ks, a, le;
-var slider;
-
-var selected = 1;
+var skd, ska, sks, sa, sle;
+var eye = vec3(5.0, 0.0, 0.0);
 
 var showClassic = true;
 
@@ -92,24 +91,45 @@ window.onload = function init(){
 			restart(vBuffer, vNBuffer);
 		});
 		
-		document.getElementById("kd").addEventListener("input", function(){
-			kd = document.getElementById("kd").value/100;
+		
+		skd = document.getElementById("kd");
+		ska = document.getElementById("ka");
+		sks = document.getElementById("ks");
+		sa = document.getElementById("a");
+		sle = document.getElementById("le")
+		
+		kd = skd.value/100;
+		ka = ska.value/100;
+		ks = sks.value/100;
+		a = sa.value;
+		le = skd.value/100;
+		
+		gl.uniform3fv(gl.getUniformLocation(program, "eye"), eye);
+		sendcoefficients();
+		
+		skd.addEventListener("input", function(){
+			kd = skd.value/100;
+			sendcoefficients();
 		});
 		
-		document.getElementById("ka").addEventListener("input", function(){
-			ka = document.getElementById("ka").value/100;
+		ska.addEventListener("input", function(){
+			ka = ska.value/100;
+			sendcoefficients();
 		});
 			
-		document.getElementById("ks").addEventListener("input", function(){
-			ks = document.getElementById("ks").value/100;
+		sks.addEventListener("input", function(){
+			ks = sks.value/100;
+			sendcoefficients();
 		});
 		
-		document.getElementById("a").addEventListener("input", function(){
-			a = document.getElementById("a").value;
+		sa.addEventListener("input", function(){
+			a = sa.value;
+			sendcoefficients();
 		});
 		
-		document.getElementById("le").addEventListener("input", function(){
-			le = document.getElementById("le").value;
+		sle.addEventListener("input", function(){
+			sle.value/100;
+			sendcoefficients();
 		});
 
 		
@@ -160,6 +180,11 @@ window.onload = function init(){
 	}
 	
 	function sendcoefficients(){
+		gl.uniform1f(gl.getUniformLocation(program, "akd"), kd);
+		gl.uniform1f(gl.getUniformLocation(program, "aka"), ka);
+		gl.uniform1f(gl.getUniformLocation(program, "aks"), ks);
+		gl.uniform1f(gl.getUniformLocation(program, "aa"), a);
+		gl.uniform1f(gl.getUniformLocation(program, "ale"), le);
 		
 	}
 
@@ -172,10 +197,10 @@ window.onload = function init(){
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.BACK);
 		
-		look = lookAt(vec3(5.0,0.0,0.0), vec3(0.0,0.0,0.0), vec3(0.0,1.0,0.0));
+		look = lookAt(eye, vec3(0.0,0.0,0.0), vec3(0.0,1.0,0.0));
 		projection = mult(pin, look);
 			
-		theta += 0.05
+		theta += 0.02;
 			
 		yrot = mat4(Math.cos(theta),0,Math.sin(theta),0,
 					0,1,0,0,
