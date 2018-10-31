@@ -21,6 +21,7 @@
 		varying vec4 a;
 		
 		uniform mat4 modelViewMatrix;
+		uniform mat4 projection;
 		uniform float ale;
 		uniform float akd;
 		uniform float aka;
@@ -32,12 +33,12 @@
 		{
 			fColor = (0.5*vPosition+0.5);
 			le = vec4(0.0,0.0,-1.0,0.0);
-			eye4 = vec4(eye, 0.0);
-			r = reflect(normalize(-le), normalize(vNormal));
+			eye4 = -vec4((modelViewMatrix*vPosition).xyz, 0.0);
+			r = modelViewMatrix*reflect(normalize(le), normalize(vNormal));
 			fColor = fColor*(ale*aka + ale*akd*max(dot(-le, vNormal), 0.0) + ale*aks*pow(max(dot(r, eye4), 0.0), aa));
 			//v is vector from point p to viever, not viewer position. However, since we are looking at origin, this is the case for this instance
 			
-			gl_Position = modelViewMatrix * vPosition;
+			gl_Position = projection * modelViewMatrix * vPosition;
 			fNormal = vNormal;
 		}
 	</script>
