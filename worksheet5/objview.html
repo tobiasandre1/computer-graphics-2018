@@ -26,15 +26,9 @@
 		
 		void main()
 		{	
-			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-			//forskel mellem garoud og phong er om man laver beregning i vertex eller fragment shader og renormaliserer normaler
-			n = normalize(fNormal);
-			r = reflect(normalize(-le), normalize(fNormal));
-		
-			gl_FragColor = fColor*(lc*ka + lc*kd*max(dot(-le, n), 0.0) + lc*ks*pow(max(dot(r, eye4), 0.0), a));
+			
+			gl_FragColor = fColor;
 			gl_FragColor.a = 1.0;
-			
-			
 			
 		}
 	</script>
@@ -42,7 +36,8 @@
 	<script type="text/javascript" src="../common/webgl-utils.js"></script>
 	<script type="text/javascript" src="../common/initShaders.js"></script>
 	<script type="text/javascript" src="../common/MV.js"></script>
-	<script type="text/javascript" src="part4.js"></script>
+	<script type="text/javascript" src="../common/OBJParser.js"></script>
+	<script type="text/javascript" src="objview.js"></script>
 	
 </head>
 
