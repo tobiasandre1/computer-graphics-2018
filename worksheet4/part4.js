@@ -128,7 +128,7 @@ window.onload = function init(){
 		});
 		
 		sle.addEventListener("input", function(){
-			sle.value/100;
+			le = sle.value/100;
 			sendcoefficients();
 		});
 
