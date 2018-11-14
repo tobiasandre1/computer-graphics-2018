@@ -13,13 +13,14 @@
 		varying vec4 fNormal;
 		
 		uniform mat4 modelViewMatrix;
-		uniform vec4 lightpos;
+		
 		
 		void main()
 		{
 			fColor = 0.5*vPosition+0.5;
+			vec4 le = vec4(0.0,0.0,-1.0,0.0);
+			fColor = fColor*dot(-le,vNormal);
 			gl_Position = modelViewMatrix * vPosition;
-			fNormal = vNormal;
 		}
 	</script>
 	
@@ -34,10 +35,8 @@
 			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 			//forskel mellem garoud og phong er om man laver beregning i vertex eller fragment shader og renormaliserer normaler
 			//vec4 n = normalize(fNormal);
-			vec4 n = fNormal;
-			vec4 le = vec4(0.0,0.0,-1.0,0.0);
-		
-			gl_FragColor = fColor*dot(-le,n);
+			gl_FragColor = fColor;
+			//move things above to vertex shader
 			gl_FragColor.a = 1.0;
 			
 			

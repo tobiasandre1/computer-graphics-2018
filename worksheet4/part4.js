@@ -2,8 +2,9 @@ var modelViewMatrix, ctm;
 var vertices, pointsArray, normalsArray;
 var subs;
 var look, translate, scale, ort, pin, projection, temp;
-
-var selected = 1;
+var kd, ka, ks, a, le;
+var skd, ska, sks, sa, sle;
+var eye = vec3(5.0, 0.0, 0.0);
 
 var showClassic = true;
 
@@ -65,22 +66,13 @@ window.onload = function init(){
 		gl.bindBuffer(gl.ARRAY_BUFFER,mBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, flatten(modelViewMatrix), gl.STATIC_DRAW);
 		
-		modelViewMatrixLoc = gl.getUniformLocation(program,"modelViewMatrix")
+		modelViewMatrixLoc = gl.getUniformLocation(program,"modelViewMatrix");
 		
 		ort = ortho(-1.0, 1.0, -1.0, 1.0, 0.01, 1000.0);	
 		pin = perspective(45.0, canvas.width/canvas.height, 0.01, 1000.0);
-			
-		//Lighting	
-		/*
-		var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0);
-		var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
-		var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);*/	
 		
-		//diffuse 
-		
-		var lightIntensity = vec4(1.0, 1.0, 1.0, 1.0);
-		//var reflectionCoef
-		var lightPosition = vec4(0.0, 0.0, -1.0, 0.0);
+		projectionLoc = gl.getUniformLocation(program,"projection");
+		gl.uniformMatrix4fv(projectionLoc, false, flatten(pin));
 		
 		document.getElementById("inc").addEventListener("mousedown", function() {
 			if(subs<10){
@@ -102,7 +94,48 @@ window.onload = function init(){
 			restart(vBuffer, vNBuffer);
 		});
 		
+		
+		skd = document.getElementById("kd");
+		ska = document.getElementById("ka");
+		sks = document.getElementById("ks");
+		sa = document.getElementById("a");
+		sle = document.getElementById("le")
+		
+		kd = skd.value/100;
+		ka = ska.value/100;
+		ks = sks.value/100;
+		a = sa.value;
+		le = skd.value/100;
+		
+		gl.uniform3fv(gl.getUniformLocation(program, "eye"), eye);
+		sendcoefficients();
+		
+		skd.addEventListener("input", function(){
+			kd = skd.value/100;
+			sendcoefficients();
+		});
+		
+		ska.addEventListener("input", function(){
+			ka = ska.value/100;
+			sendcoefficients();
+		});
 			
+		sks.addEventListener("input", function(){
+			ks = sks.value/100;
+			sendcoefficients();
+		});
+		
+		sa.addEventListener("input", function(){
+			a = sa.value/5;
+			sendcoefficients();
+		});
+		
+		sle.addEventListener("input", function(){
+			le = sle.value/100;
+			sendcoefficients();
+		});
+
+		
 		render();
 	}
 
@@ -115,7 +148,7 @@ window.onload = function init(){
 			normalsArray.push(vec4(a[0], a[1], a[2], 0.0));
 			normalsArray.push(vec4(b[0], b[1], b[2], 0.0));
 			normalsArray.push(vec4(c[0], c[1], c[2], 0.0));
-		}
+	}
 		
 	function divideTriangle(a, b, c, count)
 	{
@@ -148,6 +181,14 @@ window.onload = function init(){
 		gl.bindBuffer(gl.ARRAY_BUFFER, vNBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW);
 	}
+	
+	function sendcoefficients(){
+		gl.uniform1f(gl.getUniformLocation(program, "akd"), kd);
+		gl.uniform1f(gl.getUniformLocation(program, "aka"), ka);
+		gl.uniform1f(gl.getUniformLocation(program, "aks"), ks);
+		gl.uniform1f(gl.getUniformLocation(program, "aa"), a);
+		gl.uniform1f(gl.getUniformLocation(program, "ale"), le);	
+	}
 
 	var theta = 0.0;
 	function render(){		
@@ -157,20 +198,14 @@ window.onload = function init(){
 		gl.enable(gl.DEPTH_TEST);
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.BACK);
-		
-		look = lookAt(vec3(5.0,0.0,0.0), vec3(0.0,0.0,0.0), vec3(0.0,1.0,0.0));
-		projection = mult(pin, look);
+
+		eye = vec3(5*Math.cos(theta), 0.0, -5*Math.sin(theta));
+		look = lookAt(eye, vec3(0.0,0.0,0.0), vec3(0.0,1.0,0.0));
 			
-		theta += 0.05
-			
-		yrot = mat4(Math.cos(theta),0,Math.sin(theta),0,
-					0,1,0,0,
-					-Math.sin(theta),0,Math.cos(theta),0,
-					0,0,0,1);
+		theta += 0.02;
 		
 		ctm = mat4();
-		ctm = mult(ctm, projection);
-		ctm = mult(ctm, yrot);
+		ctm = mult(ctm, look);
 		gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
 		gl.drawArrays(gl.TRIANGLES, 0, pointsArray.length);
 		
