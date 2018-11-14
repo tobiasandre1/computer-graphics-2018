@@ -187,8 +187,7 @@ window.onload = function init(){
 		gl.uniform1f(gl.getUniformLocation(program, "aka"), ka);
 		gl.uniform1f(gl.getUniformLocation(program, "aks"), ks);
 		gl.uniform1f(gl.getUniformLocation(program, "aa"), a);
-		gl.uniform1f(gl.getUniformLocation(program, "ale"), le);
-		
+		gl.uniform1f(gl.getUniformLocation(program, "ale"), le);	
 	}
 
 	var theta = 0.0;
