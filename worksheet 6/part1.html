@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<!--<link rel="stylesheet" type="text/css" href="drawingapp.css">-->
+
+	<script id="vertex-shader" type="x-shader/x-vertex">
+		precision mediump float;
+		
+		attribute vec3 a_Position;
+		attribute vec2 a_Tex;
+		
+		varying vec4 f_Color;
+		varying vec2 f_Tex;
+		
+		uniform mat4 u_modelMatrix;
+		uniform mat4 u_projectionMatrix;
+		uniform mat4 u_viewMatrix;
+		varying mat4 modelViewMatrix;
+		
+		uniform sampler2D u_texMap;
+		
+		void main()
+		{
+		
+			//gl_Position = vec4(a_Position, 1.0);
+			f_Color = vec4(1.0, 1.0, 1.0, 1.0);
+			f_Tex = a_Tex;
+			gl_Position = u_projectionMatrix * vec4(a_Position, 1.0);
+		}
+	</script>
+	
+	<script id="fragment-shader" type="x-shader/x-fragment">
+		precision mediump float;
+		
+		varying vec4 f_Color;
+		varying vec2 f_Tex;
+		
+		uniform sampler2D u_texMap;
+		
+		void main()
+		{	
+			/*
+			normalMatrix = modelViewMatrix; //Incorrect
+			n = normalize(normalMatrix * vec4(f_Normal, 0.0));
+			l = -normalize(vec4(f_lightsrc, 0.0));
+			v = -normalize(modelViewMatrix * vec4(f_Position, 0.0));
+			r = normalize(reflect(-l, n));
+			
+			gl_FragColor = f_Color*(le*ka + le*kd*max(dot(l, n), 0.0) + le*ks*pow(max(dot(r,v), 0.0), a));
+			gl_FragColor.a = 1.0;*/
+			
+			gl_FragColor = f_Color * texture2D(u_texMap, f_Tex);
+			
+		}
+	</script>
+
+	<script type="text/javascript" src="../common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../common/initShaders.js"></script>
+	<script type="text/javascript" src="../common/MV.js"></script>
+	<!--<script type="text/javascript" src="../common/OBJParser.js"></script>-->
+	<script type="text/javascript" src="part1.js"></script>
+	
+</head>
+
+<body>
+	
+	<canvas id="webgl" width="512" height="512">
+		Your browser does not support webgl
+	</canvas>
+	
+	<!--
+	Type in run window
+	chrome.exe --user-data-dir="C:/Chrome dev session" --disable-web-security
+	-->
+	
+
+</body>
+
+</html>
