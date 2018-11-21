@@ -19,8 +19,10 @@
 		varying float ka;
 		varying float ks;
 		varying float a;
+		varying vec4 pos;
 		
 		uniform mat4 modelViewMatrix;
+		uniform mat4 projection;
 		uniform float ale;
 		uniform float akd;
 		uniform float aka;
@@ -37,14 +39,14 @@
 			ks = aks;
 			ka = aka;
 			a = aa;
-			eye4 = vec4(eye, 0.0);
+			pos = vPosition;
 			
 			//le = vec4(0.0,0.0,-1.0,0.0);
 			//r = reflect(normalize(-le), normalize(vNormal));
 			//fColor = fColor*(ale*aka + ale*akd*max(dot(-le, vNormal), 0.0) + ale*aks*pow(max(dot(r, eye4), 0.0), aa));
 			//v is vector from point p to viever, not viewer position. However, since we are looking at origin, this is the case for this instance
 			
-			gl_Position = modelViewMatrix * vPosition;
+			gl_Position = projection * modelViewMatrix * vPosition;
 			fNormal = vNormal;
 		}
 	</script>
@@ -54,7 +56,7 @@
 		
 		varying vec4 fColor;
 		varying vec4 fNormal;
-		varying vec4 eye4;
+		vec4 eye4;
 		vec4 r;
 		varying vec4 le;
 		varying float lc;
@@ -62,6 +64,10 @@
 		varying float ka;
 		varying float ks;
 		varying float a;
+		varying vec4 pos;
+		
+		uniform mat4 modelViewMatrix;
+		uniform mat4 projection;
 		
 		vec4 n;
 		
@@ -70,7 +76,8 @@
 			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 			//forskel mellem garoud og phong er om man laver beregning i vertex eller fragment shader og renormaliserer normaler
 			n = normalize(fNormal);
-			r = reflect(normalize(-le), normalize(fNormal));
+			r = modelViewMatrix*reflect(normalize(le), normalize(fNormal));
+			eye4 = -vec4((modelViewMatrix*pos).xyz, 0.0);
 		
 			gl_FragColor = fColor*(lc*ka + lc*kd*max(dot(-le, n), 0.0) + lc*ks*pow(max(dot(r, eye4), 0.0), a));
 			gl_FragColor.a = 1.0;
