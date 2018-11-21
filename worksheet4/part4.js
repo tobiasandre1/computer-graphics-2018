@@ -1,10 +1,12 @@
-var modelViewMatrix, ctm;
+var modelViewMatrix, ctm, projectionMatrix;
 var vertices, pointsArray, normalsArray;
 var subs;
 var look, translate, scale, ort, pin, projection, temp;
 var kd, ka, ks, a, le;
 var skd, ska, sks, sa, sle;
 var eye = vec3(5.0, 0.0, 0.0);
+
+
 
 var showClassic = true;
 
@@ -61,12 +63,24 @@ window.onload = function init(){
 		
 		modelViewMatrix = mat4();
 		modelViewMatrix = mult(modelViewMatrix, mat4());
+	
 		
 		var mBuffer = gl.createBuffer();	
 		gl.bindBuffer(gl.ARRAY_BUFFER,mBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, flatten(modelViewMatrix), gl.STATIC_DRAW);
 		
 		modelViewMatrixLoc = gl.getUniformLocation(program,"modelViewMatrix");
+		
+		projectionMatrix = mat4();
+		projectionMatrix = mult(projectionMatrix, mat4());
+		
+		var PBuffer = gl.createBuffer();	
+		gl.bindBuffer(gl.ARRAY_BUFFER,PBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, flatten(projectionMatrix), gl.STATIC_DRAW);
+		
+		projectionMatrixLoc = gl.getUniformLocation(program,"projectionMatrix")
+		
+		
 		
 		ort = ortho(-1.0, 1.0, -1.0, 1.0, 0.01, 1000.0);	
 		pin = perspective(45.0, canvas.width/canvas.height, 0.01, 1000.0);
@@ -198,6 +212,7 @@ window.onload = function init(){
 		gl.enable(gl.DEPTH_TEST);
 		gl.enable(gl.CULL_FACE);
 		gl.cullFace(gl.BACK);
+<<<<<<< Updated upstream
 
 		eye = vec3(5*Math.cos(theta), 0.0, -5*Math.sin(theta));
 		look = lookAt(eye, vec3(0.0,0.0,0.0), vec3(0.0,1.0,0.0));
@@ -206,6 +221,19 @@ window.onload = function init(){
 		
 		ctm = mat4();
 		ctm = mult(ctm, look);
+=======
+		eye = vec3(5*Math.cos(theta),0,-5*Math.sin(theta));
+		
+		look = lookAt(eye, vec3(0.0,0.0,0.0), vec3(0.0,1.0,0.0));
+		projection = look ;
+			
+		theta += 0.02;
+			
+		
+		ctm = mat4();
+		ctm = mult(ctm, pin);
+		gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projection));
+>>>>>>> Stashed changes
 		gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
 		gl.drawArrays(gl.TRIANGLES, 0, pointsArray.length);
 		
