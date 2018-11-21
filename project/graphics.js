@@ -26,9 +26,7 @@ window.onload = function init(){
 	
 	data.rotation = 0;
 	data.rotationMatrix = mat4();
-	data.pitch = 0;
-	data.yaw = 0;
-	data.roll = 0;
+	data.flightvals = [0, 0, 0]; //Pitch,Roll,Yaw
 	
 	
 	//Data
@@ -90,7 +88,28 @@ window.onload = function init(){
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indexBuffer);
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(data.indices), gl.STATIC_DRAW);
 
+	
+	//Matrices
 	var matrices = makeMatrices(data);
+	
+	
+	//Inputs
+	var input = new Object();
+	input.pitch = document.getElementById("pitch");
+	input.roll = document.getElementById("roll");
+	input.yaw = document.getElementById("yaw");
+	input.allinputs = [input.pitch, input.roll, input.yaw];
+	
+	for(var i=0; i<input.allinputs.length; i++){
+		input.allinputs[i].addEventListener("input", move(i));
+	}
+	
+	function move(i){
+		return function(){
+			data.flightvals[i] = input.allinputs[i].value-50;
+		}
+	}
+	
 	
 	//Draw all the things
 	function draw(){
