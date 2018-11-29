@@ -106,7 +106,8 @@ window.onload = function init(){
 	
 	function move(i){
 		return function(){
-			data.flightvals[i] = input.allinputs[i].value-50;
+			data.flightvals[i] = (input.allinputs[i].value-50);
+			matrices = makeMatrices(data);
 		}
 	}
 	
@@ -185,6 +186,8 @@ function makeMatrices(data){
 	
 	gl.program.u_model = gl.getUniformLocation(gl.program,"u_model");
 	matrices.models = new Object();
+	matrices.flapwidth = 0.2;
+	
 	matrices.models.body = mat4(2,0,0,0,
 								0,0.2,0,0,
 								0,0,0.2,0,
@@ -193,8 +196,13 @@ function makeMatrices(data){
 								0,0.04,0,-0.05,
 								0,0,1.7,0,
 								0,0,0,1.0);
+	matrices.models.flap = mat4(matrices.flapwidth,0,0,-0.05,
+								0,0.04,0,-0.05,
+								0,0,0.5,0.5,
+								0,0,0,1.0);
+	matrices.models.roll = mult(translate(-Math.abs((Math.cos(radians(data.flightvals[1]))-1)*matrices.flapwidth/2), (Math.sin(radians(data.flightvals[1])))*matrices.flapwidth/2, 0),rotateZ(data.flightvals[1]));
 	
-	matrices.modelarray = [matrices.models.body, matrices.models.wing];
+	matrices.modelarray = [matrices.models.body, matrices.models.wing, mult(matrices.models.roll, matrices.models.flap)];
 	
 	return matrices;
 }
