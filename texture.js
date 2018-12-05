@@ -40,7 +40,9 @@ window.onload = function init(){
 		
 		program = initShaders(gl, "vertex-shader", "fragment-shader");
 		gl.useProgram(program);
-
+		
+		gl.enable(gl.DEPTH_TEST);
+		gl.enable(gl.CULL_FACE);
 		
 		var vPosition = gl.getAttribLocation(program, "vPosition");
 		gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -97,36 +99,10 @@ window.onload = function init(){
 		
 		
 		
-		var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
-		gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
-		gl.enableVertexAttribArray(vTexCoord);
-		
-		var tBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, flatten(texCoordsArray), gl.STATIC_DRAW)
-		
-		var vBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW)
-		
-		
-					
-		var texture = gl.createTexture();
-		gl.uniform1i(gl.getUniformLocation(program, "texMap"), 0);
 		
 		
 		
-		
-		
-		
-		
-	render(); 
-}
-		
-
-		
-		
-function quad(a, b, c, d)
+		function quad(a, b, c, d)
 		{
 			
 			
@@ -156,17 +132,44 @@ function quad(a, b, c, d)
 			
 			
 		}
+		
+		quad(0,1,2,3);	
+		
+		var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
+		gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
+		gl.enableVertexAttribArray(vTexCoord);
+		
+		var tBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, flatten(texCoordsArray), gl.STATIC_DRAW)
+		
+		var vBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW)
+		
+		
+					
+		var texture = gl.createTexture();
+		gl.uniform1i(gl.getUniformLocation(program, "texMap"), 0);
+		
+		
+		
+	render(); 
+}
+		
 
-quad(0,1,2,3);		
+		
+		
+
+
+	
 		
 function render(){
 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 gl.generateMipmap(gl.TEXTURE_2D);
-var vBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW)
+
 gl.drawElements(gl.TRIANGLES, pointsArray.length,gl.UNSIGNED_SHORT,0);
 
 requestAnimFrame(render);
