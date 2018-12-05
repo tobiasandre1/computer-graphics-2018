@@ -20,19 +20,14 @@
 		varying vec4 ks;
 		varying vec4 a;
 		
-		
 		uniform mat4 modelViewMatrix;
-<<<<<<< Updated upstream
 		uniform mat4 projection;
-=======
-		uniform mat4 projectionMatrix;
->>>>>>> Stashed changes
 		uniform float ale;
 		uniform float akd;
 		uniform float aka;
 		uniform float aks;
 		uniform float aa;
-		uniform vec3  eye;
+		uniform vec3 eye;
 		
 		void main()
 		{
@@ -41,14 +36,9 @@
 			eye4 = -vec4((modelViewMatrix*vPosition).xyz, 0.0);
 			r = modelViewMatrix*reflect(normalize(le), normalize(vNormal));
 			fColor = fColor*(ale*aka + ale*akd*max(dot(-le, vNormal), 0.0) + ale*aks*pow(max(dot(r, eye4), 0.0), aa));
-			
 			//v is vector from point p to viever, not viewer position. However, since we are looking at origin, this is the case for this instance
 			
-<<<<<<< Updated upstream
 			gl_Position = projection * modelViewMatrix * vPosition;
-=======
-			gl_Position = projectionMatrix*modelViewMatrix * vPosition;
->>>>>>> Stashed changes
 			fNormal = vNormal;
 		}
 	</script>
