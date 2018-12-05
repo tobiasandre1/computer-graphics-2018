@@ -24,7 +24,10 @@ window.onload = function init(){
 	
 	var data = new Object();
 	
-	data.rotation = 0;
+	data.rotspeed = 1.0/50.0;
+	data.rotx = 0;
+	data.roty = 0;
+	data.rotz = 0;
 	data.rotationMatrix = mat4();
 	data.flightvals = [0, 0, 0]; //Pitch,Roll,Yaw
 	
@@ -128,10 +131,19 @@ function render(gl, data, matrices){
 	gl.cullFace(gl.FRONT);
 	
 	//Rotation
-	data.rotation += 0.5;
-	data.rotationMatrix = rotateX(data.rotation);
+	data.rotx += -data.flightvals[1]*data.rotspeed;
+	data.roty += -data.flightvals[2]*data.rotspeed;
+	data.rotz += -data.flightvals[0]*data.rotspeed;
 	
 	matrices.view = lookAt(vec3(5.0,5.0,5.0), vec3(0.0,0.0,0.0), vec3(0.0,1.0,0.0));
+	
+	matrices.ctm = mat4();
+	matrices.ctm = mult(matrices.ctm, rotateX(data.rotx));
+	matrices.ctm = mult(matrices.ctm, rotateY(data.roty));
+	matrices.ctm = mult(matrices.ctm, rotateZ(data.rotz));
+	
+	matrices.view = mult(matrices.view , matrices.ctm);
+	
 	gl.uniformMatrix4fv(gl.program.u_view, false, flatten(matrices.view));
 	
 	
@@ -140,10 +152,8 @@ function render(gl, data, matrices){
 	gl.uniformMatrix4fv(gl.program.u_projectionMatrix, false, flatten(projectionMatrix));
 	gl.uniformMatrix4fv(gl.program.u_viewMatrix, false, flatten(viewMatrix));*/
 	
-	var ctm;
 	for(var i = 0; i<matrices.modelarray.length; i++){
-		ctm = mult(data.rotationMatrix, matrices.modelarray[i]);
-		gl.uniformMatrix4fv(gl.program.u_model, false, flatten(ctm));
+		gl.uniformMatrix4fv(gl.program.u_model, false, flatten(matrices.modelarray[i]));
 		gl.drawElements(gl.TRIANGLES, data.indices.length, gl.UNSIGNED_BYTE, 0);
 	}
 	
@@ -187,6 +197,7 @@ function makeMatrices(data){
 	gl.program.u_model = gl.getUniformLocation(gl.program,"u_model");
 	matrices.models = new Object();
 	matrices.flapwidth = 0.2;
+	matrices.flapheight = 0.04;
 	
 	matrices.models.body = mat4(2,0,0,0,
 								0,0.2,0,0,
@@ -196,15 +207,30 @@ function makeMatrices(data){
 								0,0.04,0,-0.05,
 								0,0,1.7,0,
 								0,0,0,1.0);
-	matrices.models.flap = mat4(matrices.flapwidth,0,0,-0.05,
-								0,0.04,0,-0.05,
-								0,0,0.5,0.5,
+	matrices.models.flap = mat4(matrices.flapwidth,0,0,0,
+								0,matrices.flapheight,0,0,
+								0,0,0.5,0,
 								0,0,0,1.0);
-	matrices.models.roll = mult(translate(-Math.abs((Math.cos(radians(data.flightvals[1]))-1)*matrices.flapwidth/2), (Math.sin(radians(data.flightvals[1])))*matrices.flapwidth/2, 0),rotateZ(data.flightvals[1]));
 	
-	matrices.modelarray = [matrices.models.body, matrices.models.wing, mult(matrices.models.roll, matrices.models.flap)];
+	matrices.modelarray = [
+			matrices.models.body, 
+			matrices.models.wing, 
+			rotting(data, 1, 1, matrices.models.flap, 'Z', matrices.flapwidth, translate(0, -0.05, 0.5)),
+			rotting(data, 1, -1, matrices.models.flap, 'Z', matrices.flapwidth, translate(0, -0.05, -0.5))
+		];
 	
 	return matrices;
 }
 
-	
+function rotting(data, fv, mod, matrix, axis, width, offset){
+	var result;
+	var theta = data.flightvals[fv]*mod;
+	if(axis = 'Z'){
+		result = mult(translate(-width/2,0,0),rotateZ(theta));
+		result = mult(result, matrix);
+		result = mult(translate(width/2,0,0), result);
+		result = mult(translate(-Math.cos(radians(theta))*width/2, Math.sin(radians(theta))*width/2,0),result);
+		result = mult(offset, result);
+	}
+	return result;
+}	
