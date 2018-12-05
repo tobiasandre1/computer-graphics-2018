@@ -6,26 +6,22 @@ var axis = [];
 var modelViewMatrix;
 var ctm;
 
-var iso = mat4(1.732050808/2.449489743,0,-1.732050808/2.449489743,0,
-				1/2.449489743,2/2.449489743,1/2.449489743,0,
-				1.414213562/2.449489743,-1.414213562/2.449489743,1.414213562/2.449489743,0,
-				0,0,0,1
-				);
+var look = mat4();
 
 
-var twoPoint = mat4(1.0,0,0,(Math.sqrt(2)/2)/1,
-				0,1.0,0,0,
-				0,0,1.0,(Math.sqrt(2)/2)/1,
-				0,0,0,1.0);
+var per = perspective(45, 1, 0.001, 1000);			
+					
+var lookOne = lookAt( vec3(2,0,0), vec3(0,0,0), vec3(0,1,0) );
+var lookTwo = lookAt( vec3(2,2,0), vec3(0,0,0), vec3(0,1,0) );
+var lookThree = lookAt( vec3(2,2,2), vec3(0,0,0), vec3(0,1,0) );
+
 
 window.onload = function init()
 {
 	canvas = document.getElementById("gl-canvas");
 		
 	gl = WebGLUtils.setupWebGL(canvas);
-	if(!gl) {
-		alert("WebGL isn't available");
-	}
+	if(!gl) {alert("WebGL isn't available");}
 		
 	gl.viewport(0,0,canvas.width, canvas.height);
 	gl.clearColor(0.3921,0.5843,0.9294,1.0);
@@ -34,14 +30,15 @@ window.onload = function init()
 	gl.useProgram(program);
 	
 	vertices = [
-	vec3(-0.5, -0.5, 0.5),
-	vec3(-0.5, 0.5, 0.5),
-	vec3(0.5, 0.5, 0.5),
-	vec3(0.5, -0.5, 0.5),
+	
 	vec3(-0.5, -0.5, -0.5),
 	vec3(-0.5, 0.5, -0.5),
 	vec3(0.5, 0.5, -0.5),
-	vec3(0.5, -0.5, -0.5)
+	vec3(0.5, -0.5, -0.5),
+	vec3(-0.5, -0.5, 0.5),
+	vec3(-0.5, 0.5, 0.5),
+	vec3(0.5, 0.5, 0.5),
+	vec3(0.5, -0.5, 0.5)
 	];
 
 	indices = [
@@ -75,14 +72,11 @@ window.onload = function init()
 
 	
 	var a = document.getElementById("ButtonX")
-	a.addEventListener("click", function() {
-	axis = xAxis; 
-	
-	}, false);
+	a.addEventListener("click", function() {look = lookOne; }, false);
 	var b = document.getElementById("ButtonY")
-	b.addEventListener("click", function() { axis = yAxis; }, false);
+	b.addEventListener("click", function() { look = lookTwo; }, false);
 	var c = document.getElementById("ButtonZ")
-	c.addEventListener("click", function() { axis = zAxis; }, false);
+	c.addEventListener("click", function() {look = lookThree; }, false);
 
 		
 	modelViewMatrix = mat4();
@@ -98,6 +92,7 @@ window.onload = function init()
 	
 	
 	
+	
 render();
 }		
 	
@@ -105,14 +100,17 @@ render();
 function render()
 {
 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+
+ctm = per;
+ctm = mult(ctm, look);
 theta[axis] += 1.0;
-ctm = rotateX(theta[xAxis]);
+ctm = mult(ctm, rotateX(theta[xAxis]));
 ctm = mult(ctm, rotateY(theta[yAxis]));
 ctm = mult(ctm, rotateZ(theta[zAxis]));
-ctm = mult(ctm, twoPoint);
-ctm = mult(ctm, iso);
 
 gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(ctm));
-gl.drawElements(gl.TRIANGLE_STRIP, indices.length,gl.UNSIGNED_BYTE, 0);
+gl.drawElements(gl.LINE_LOOP, indices.length,gl.UNSIGNED_BYTE, 0);
+
 requestAnimFrame(render);
 }

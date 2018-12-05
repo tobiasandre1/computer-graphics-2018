@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<!--<link rel="stylesheet" type="text/css" href="drawingapp.css">-->
+
+	<script id="vertex-shader" type="x-shader/x-vertex">
+		precision mediump float;
+		attribute vec4 vPosition;
+		attribute vec4 vNormal;
+		attribute vec4 vColor;
+		
+		varying vec4 fColor;
+		varying vec4 fNormal;
+	
+		
+		void main()
+		{
+			fColor = (0.5*vPosition+0.5);
+			fNormal = vNormal;
+			fColor = vColor;
+			
+			//v is vector from point p to viever, not viewer position. However, since we are looking at origin, this is the case for this instance
+			
+			gl_Position = vPosition;
+			fNormal = vNormal;
+		}
+	</script>
+	
+	<script id="fragment-shader" type="x-shader/x-fragment">
+		precision mediump float;
+		
+		varying vec4 fColor;
+		varying vec4 fNormal;
+
+		
+		void main()
+		{	
+			
+			vec4 n = normalize(fNormal);
+			gl_FragColor = fColor;
+			
+			
+			
+		}
+	</script>
+
+	<script type="text/javascript" src="../common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../common/initShaders.js"></script>
+	<script type="text/javascript" src="../common/MV.js"></script>
+	<script type="text/javascript" src="../common/OBJParser.js"></script>
+	<script type="text/javascript" src="readOBJ.js"></script>
+	
+</head>
+
+<body>
+	
+	<canvas id="webgl" width="512" height="512">
+		Your browser does not support webgl
+	</canvas>
+	
+
+</body>
+
+</html>

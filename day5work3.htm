@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<!--<link rel="stylesheet" type="text/css" href="drawingapp.css">-->
+
+	<script id="vertex-shader" type="x-shader/x-vertex">
+		precision mediump float;
+		attribute vec4 vPosition;
+		attribute vec4 vNormal;
+		attribute vec4 vColor;
+		
+		varying vec4 fColor;
+		varying vec4 fNormal;
+		varying vec4 le;
+		varying vec4 r;
+		varying vec4 eye4;
+		varying vec4 kd;
+		varying vec4 ka;
+		varying vec4 ks;
+		varying vec4 a;
+		
+		
+		uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+		uniform float ale;
+		uniform float akd;
+		uniform float aka;
+		uniform float aks;
+		uniform float aa;
+		uniform vec3  eye;
+		
+		void main()
+		{
+			fColor = (0.5*vPosition+0.5);
+			le = vec4(0.0,0.0,-1.0,0.0);
+			eye4 = vec4(eye, 0.0);
+			r = reflect(normalize(-le), normalize(vNormal));
+			fColor = fColor*(ale*aka + ale*akd*max(dot(-le, vNormal), 0.0) + ale*aks*pow(max(dot(r, eye4), 0.0), aa));
+			
+			//v is vector from point p to viever, not viewer position. However, since we are looking at origin, this is the case for this instance
+			
+			gl_Position = projectionMatrix*modelViewMatrix * vPosition;
+			fNormal = vNormal;
+		}
+	</script>
+	
+	<script id="fragment-shader" type="x-shader/x-fragment">
+		precision mediump float;
+		
+		varying vec4 fColor;
+		varying vec4 fNormal;
+		varying vec4 le;
+		varying vec4 kd;
+		varying vec4 ka;
+		varying vec4 ks;
+		varying vec4 a;
+		
+		void main()
+		{	
+			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+			//forskel mellem garoud og phong er om man laver beregning i vertex eller fragment shader og renormaliserer normaler
+			vec4 n = normalize(fNormal);
+			//vec4 n = fNormal;
+		
+			gl_FragColor = fColor;
+			gl_FragColor.a = 1.0;
+			
+			
+			
+		}
+	</script>
+
+	<script type="text/javascript" src="../common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../common/initShaders.js"></script>
+	<script type="text/javascript" src="../common/MV.js"></script>
+	<script type="text/javascript" src="work53.js"></script>
+	
+</head>
+
+<body>
+	
+	<canvas id="webgl" width="512" height="512">
+		Your browser does not support webgl
+	</canvas>
+	
+
+</body>
+
+</html>
