@@ -212,11 +212,41 @@ function makeMatrices(data){
 								0,0,0.5,0,
 								0,0,0,1.0);
 	
+	matrices.models.backwing = mat4(0.25,0,0,-0.874,
+									0,0.04,0,-0.05,
+									0,0,1,0,
+									0,0,0,1);
+									
+	matrices.models.elevatorflap = mat4(0.15,0,0,0,
+									0,0.04,0,0,
+									0,0,0.3,0,
+									0,0,0,1);
+									
+	matrices.models.rudder = mat4(0.3,0,0,-0.849,
+									0,0.4,0,0.25,
+									0,0,0.04,0,
+									0,0,0,1);
+	
+	matrices.models.rudderflap = mat4(0.08,0,0,0,
+									0,0.3,0,0.0,
+									0,0,0.04,0,
+									0,0,0,1);
+	
+	
+	
+	
+	
 	matrices.modelarray = [
 			matrices.models.body, 
 			matrices.models.wing, 
+			matrices.models.backwing,
+			matrices.models.rudder,
 			rotting(data, 1, 1, matrices.models.flap, 'Z', matrices.flapwidth, translate(0, -0.05, 0.5)),
-			rotting(data, 1, -1, matrices.models.flap, 'Z', matrices.flapwidth, translate(0, -0.05, -0.5))
+			rotting(data, 1, -1, matrices.models.flap, 'Z', matrices.flapwidth, translate(0, -0.05, -0.5)),
+			rotting(data, 0, 1, matrices.models.elevatorflap, 'Z', matrices.flapwidth, translate(-0.95, -0.05, 0.3)),
+			rotting(data, 0, 1, matrices.models.elevatorflap, 'Z', matrices.flapwidth, translate(-0.95, -0.05, -0.3)),
+			rotting(data, 2, 1, matrices.models.rudderflap, 'Y', matrices.flapwidth, translate(-0.94, 0.275, 0))
+			
 		];
 	
 	return matrices;
@@ -225,12 +255,20 @@ function makeMatrices(data){
 function rotting(data, fv, mod, matrix, axis, width, offset){
 	var result;
 	var theta = data.flightvals[fv]*mod;
-	if(axis = 'Z'){
+	if(axis == 'Z'){
 		result = mult(translate(-width/2,0,0),rotateZ(theta));
 		result = mult(result, matrix);
 		result = mult(translate(width/2,0,0), result);
 		result = mult(translate(-Math.cos(radians(theta))*width/2, Math.sin(radians(theta))*width/2,0),result);
 		result = mult(offset, result);
 	}
+	else if(axis == 'Y'){
+		result = mult(translate(-width/2,0,0),rotateY(theta));
+		result = mult(result, matrix);
+		result = mult(translate(width/2,0,0), result);
+		result = mult(translate(-Math.cos(radians(theta))*width/2, 0,-Math.sin(radians(theta))*width/2),result);
+		result = mult(offset, result);
+	}
+	
 	return result;
 }	
