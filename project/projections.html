@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+	 <link rel="stylesheet" type="text/css" href="style.css">
+	<script id="vertex-shader" type="x-shader/x-vertex">
+		precision mediump float;
+		attribute vec3 a_Position;
+		attribute vec3 a_Color;
+		varying vec4 f_Color;
+		
+		uniform mat4 u_view;
+		uniform mat4 u_projection;
+		uniform mat4 u_model;
+		
+		void main()
+		{
+			f_Color = vec4(a_Color,1.0);
+			gl_Position = u_projection * u_view * u_model * vec4(a_Position,1.0);
+		}
+	</script>
+	
+	<script id="fragment-shader" type="x-shader/x-fragment">
+		precision mediump float;
+		
+		varying vec4 f_Color;
+		
+		void main()
+		{	
+			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+			
+			gl_FragColor = f_Color;
+		}
+	</script>
+
+	<script type="text/javascript" src="../common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../common/initShaders.js"></script>
+	<script type="text/javascript" src="../common/MV.js"></script>
+	<script type="text/javascript" src="graphics.js"></script>
+	
+</head>
+
+<body>
+	
+	<canvas id="webgl" width="512" height="512">
+		Your browser does not support webgl
+	</canvas>
+	
+	<input type="range" min="0" max="100" value="50" class="slider" id="pitch">Pitch
+	<input type="range" min="0" max="100" value="50" class="slider" id="roll">Roll
+	<input type="range" min="0" max="100" value="50" class="slider" id="yaw">Yaw
+	
+
+</body>
+
+</html>
