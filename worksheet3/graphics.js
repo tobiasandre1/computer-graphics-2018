@@ -112,7 +112,7 @@ window.onload = function init(){
 		gl.bindBuffer(gl.ARRAY_BUFFER,mBuffer);
 		gl.bufferData(gl.ARRAY_BUFFER, flatten(modelViewMatrix), gl.STATIC_DRAW);
 		
-		modelViewMatrixLoc = gl.getUniformLocation(program,"modelViewMatrix")
+		modelViewMatrixLoc = gl.getUniformLocation(program,"modelViewMatrix");
 		
 		var cBuffer = gl.createBuffer();
 		gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
