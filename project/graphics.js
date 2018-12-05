@@ -71,11 +71,12 @@ window.onload = function init(){
 		0, 1, 5
 	];
 	
-	console.log(data);
-	console.log(flatten(data.vertices));
+	//console.log(data);
+	//console.log(flatten(data.vertices));
 	
 	//Buffers
 	gl.program.a_Position = gl.getAttribLocation(gl.program, "a_Position");
+	gl.program.a_Normal = gl.getAttribLocation(gl.program, "a_Normal");
 	gl.program.a_Color = gl.getAttribLocation(gl.program, "a_Color");
 	
 	var buffers = initVertexBuffers(gl);
@@ -114,6 +115,9 @@ window.onload = function init(){
 		}
 	}
 	
+	var le, ka, kd, ks, a;
+	//sendcoefficients(le, ka, kd, ks, a);
+	sendcoefficients(0.5,0.5,0.5,0.5,1);
 	
 	//Draw all the things
 	function draw(){
@@ -121,6 +125,7 @@ window.onload = function init(){
 		requestAnimFrame(draw);
 	}
 	draw();
+	
 	
 }
 
@@ -142,7 +147,7 @@ function render(gl, data, matrices){
 	matrices.ctm = mult(matrices.ctm, rotateY(data.roty));
 	matrices.ctm = mult(matrices.ctm, rotateZ(data.rotz));
 	
-	matrices.view = mult(matrices.view , matrices.ctm);
+	//matrices.view = mult(matrices.view , matrices.ctm);
 	
 	gl.uniformMatrix4fv(gl.program.u_view, false, flatten(matrices.view));
 	
@@ -153,7 +158,7 @@ function render(gl, data, matrices){
 	gl.uniformMatrix4fv(gl.program.u_viewMatrix, false, flatten(viewMatrix));*/
 	
 	for(var i = 0; i<matrices.modelarray.length; i++){
-		gl.uniformMatrix4fv(gl.program.u_model, false, flatten(matrices.modelarray[i]));
+		gl.uniformMatrix4fv(gl.program.u_model, false, flatten(mult(matrices.ctm, matrices.modelarray[i])));
 		gl.drawElements(gl.TRIANGLES, data.indices.length, gl.UNSIGNED_BYTE, 0);
 	}
 	
@@ -164,7 +169,7 @@ function render(gl, data, matrices){
 function initVertexBuffers(gl){
 	var o = new Object();
 	o.vertexBuffer = createEmptyArrayBuffer(gl, gl.program.a_Position, 3, gl.FLOAT);
-	//o.normalBuffer = createEmptyArrayBuffer(gl, gl.program.a_Normal, 3, gl.FLOAT); //Index warning
+	o.normalBuffer = createEmptyArrayBuffer(gl, gl.program.a_Normal, 3, gl.FLOAT); //Index warning
 	o.colorBuffer = createEmptyArrayBuffer(gl, gl.program.a_Color, 3, gl.FLOAT); //Index warning
 	o.indexBuffer = gl.createBuffer();
 	
@@ -234,3 +239,11 @@ function rotting(data, fv, mod, matrix, axis, width, offset){
 	}
 	return result;
 }	
+
+function sendcoefficients(le, ka, kd, ks, a){
+	gl.uniform1f(gl.getUniformLocation(gl.program, "kd"), kd);
+	gl.uniform1f(gl.getUniformLocation(gl.program, "ka"), ka);
+	gl.uniform1f(gl.getUniformLocation(gl.program, "ks"), ks);
+	gl.uniform1f(gl.getUniformLocation(gl.program, "a"), a);
+	gl.uniform1f(gl.getUniformLocation(gl.program, "le"), le);	
+}
