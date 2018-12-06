@@ -45,14 +45,14 @@ window.onload = function init(){
 	];
 	
 	data.colors = [
-		0,0,0, 
+		0.1,0,0, 
 		0,1,1, 
 		0,1,1, 
-		0,0,0,
-		0,0,0, 
+		0.1,0,0,
+		0.1,0,0, 
 		0,1,1, 
 		0,1,1, 
-		0,0,0
+		0.1,0,0
 	];
 	
 	
@@ -71,7 +71,9 @@ window.onload = function init(){
 		0, 1, 5
 	];
 	
-	//console.log(data);
+	
+	data.normals = calculate_normals(data.indices, data.vertices)
+	console.log(data);
 	//console.log(flatten(data.vertices));
 	
 	//Buffers
@@ -87,6 +89,9 @@ window.onload = function init(){
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colorBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, flatten(data.colors), gl.STATIC_DRAW);
+	
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normalBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(data.normals), gl.STATIC_DRAW);
 	
 	//Indices for draw elements
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indexBuffer);
@@ -117,7 +122,7 @@ window.onload = function init(){
 	
 	var le, ka, kd, ks, a;
 	//sendcoefficients(le, ka, kd, ks, a);
-	sendcoefficients(0.5,0.5,0.5,0.5,1);
+	sendcoefficients(0.9,0.6,1.0,0.6,0.9);
 	
 	//Draw all the things
 	function draw(){
@@ -284,4 +289,56 @@ function sendcoefficients(le, ka, kd, ks, a){
 	gl.uniform1f(gl.getUniformLocation(gl.program, "ks"), ks);
 	gl.uniform1f(gl.getUniformLocation(gl.program, "a"), a);
 	gl.uniform1f(gl.getUniformLocation(gl.program, "le"), le);	
+}
+
+function calculate_normals(indices,vertices){
+	var normalsArray = [];
+	var temp = {};
+	for(var i = 0; i < indices.length; i += 3){
+		//Skal være 0 i sidste koordinat hvis 4d ellers fejl
+		//console.log(i);
+		a = vertices[indices[i]];
+		b = vertices[indices[i+1]];
+		c = vertices[indices[i+2]];
+		
+		one = vectoradd(b,a,-1);
+		two = vectoradd(c,a,-1);
+		
+		n = cross(one, two);
+		//console.log(n);
+		
+		normalsArray.push(n);
+		normalsArray.push(n);
+		normalsArray.push(n);
+		
+		
+		for(var j=0; j<3; j++){
+			if(temp[indices[i+j]] == null){
+				temp[indices[i+j]] = vec3(0,0,0);
+			}
+			temp[indices[i+j]] = vectoradd(temp[indices[i+j]], n, 1); 
+		}
+		
+		/*
+		normalsArray.push(a[0], a[1], a[2]);
+		normalsArray.push(b[0], b[1], b[2]);
+		normalsArray.push(c[0], c[1], c[2]);*/
+	}
+	
+	for(var i = 0; i<indices.length; i++){
+		normalsArray.push(temp[indices[i]]);
+	}
+	
+	//console.log(temp);
+	return normalsArray;
+}
+
+function vectoradd(a,b,mod){
+	var result = vec3(b[0]+mod*a[0], b[1]+mod*a[1], b[2]+mod*a[2]);
+	return result;
+}
+
+function vectordiv(a,mod){
+	var result = vec3(a[0]/mod, a[1]/mod, a[2]/mod);
+	return result;
 }

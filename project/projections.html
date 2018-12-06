@@ -29,7 +29,7 @@
 		void main()
 		{
 			f_lightsrc = vec3(0.0,0.0,-1.0);
-			f_Normal = vec3(1,1,1);
+			f_Normal = a_Normal;
 			f_Color = vec4(a_Color,1.0);
 			modelViewMatrix = u_view * u_model; //Projection - View - Model
 			
