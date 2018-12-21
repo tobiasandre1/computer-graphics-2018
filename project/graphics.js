@@ -266,16 +266,12 @@ function rotting(data, fv, mod, matrix, axis, width, offset){
 	var result;
 	var theta = data.flightvals[fv]*mod;
 	if(axis == 'Z'){
-		result = mult(translate(-width/2,0,0),rotateZ(theta));
-		result = mult(result, matrix);
-		result = mult(translate(width/2,0,0), result);
+		result = mult(rotateZ(theta), matrix);
 		result = mult(translate(-Math.cos(radians(theta))*width/2, Math.sin(radians(theta))*width/2,0),result);
 		result = mult(offset, result);
 	}
 	else if(axis == 'Y'){
-		result = mult(translate(-width/2,0,0),rotateY(theta));
-		result = mult(result, matrix);
-		result = mult(translate(width/2,0,0), result);
+		result = mult(rotateY(theta), matrix);
 		result = mult(translate(-Math.cos(radians(theta))*width/2, 0,-Math.sin(radians(theta))*width/2),result);
 		result = mult(offset, result);
 	}
