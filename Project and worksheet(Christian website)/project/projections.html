@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+	 <link rel="stylesheet" type="text/css" href="style.css">
+	<script id="vertex-shader" type="x-shader/x-vertex">
+		precision mediump float;
+		attribute vec3 a_Position;
+		attribute vec3 a_Color;
+		attribute vec3 a_Normal;
+		
+		varying vec3 f_Position;
+		varying vec3 f_Normal;
+		varying vec4 f_Color;
+		varying vec3 f_lightsrc;
+		
+		uniform mat4 u_view;
+		uniform mat4 u_projection;
+		uniform mat4 u_model;
+		varying mat4 modelViewMatrix;
+		
+		uniform float le;
+		uniform float kd;
+		uniform float ka;
+		uniform float ks;
+		uniform float a;
+		
+		void main()
+		{
+			f_lightsrc = vec3(0.0,0.0,-1.0);
+			f_Normal = vec3(1,1,1);
+			f_Color = vec4(a_Color,1.0);
+			modelViewMatrix = u_view * u_model; //Projection - View - Model
+			
+			f_Position = a_Position;
+			gl_Position = u_projection * u_view * u_model * vec4(a_Position,1.0);
+		}
+	</script>
+	
+	<script id="fragment-shader" type="x-shader/x-fragment">
+		precision mediump float;
+		
+		varying vec3 f_Position;
+		varying vec3 f_Normal;
+		varying vec4 f_Color;
+		
+		uniform float le;
+		uniform float kd;
+		uniform float ka;
+		uniform float ks;
+		uniform float a;
+		
+		//Viewer space variables (all normalized)
+		vec4 r; //Calculated based on l and n. reflect(). Positive light direction. 
+		vec4 v;	//Viewer. From position, to eye. v-p. Bring both v and p into view space before subtraction. v in view space equals origin.
+		vec4 l; //Inverse of light direction multiplied with model view. (Far away means parallel) (Vector from position to light, normalized)
+		vec4 n; //Normal vectors (attribute) (normal matrix instead of model view matrix = inverse transpose of model view)
+		mat4 normalMatrix;
+		varying mat4 modelViewMatrix;
+		varying vec3 f_lightsrc;
+		
+		void main()
+		{	
+			//gl_FragColor = f_Color;
+			
+			normalMatrix = modelViewMatrix; //Incorrect
+			n = normalize(normalMatrix * vec4(f_Normal, 0.0));
+			l = -normalize(vec4(f_lightsrc, 0.0));
+			v = -normalize(modelViewMatrix * vec4(f_Position, 0.0));
+			r = normalize(reflect(-l, n));
+			
+			gl_FragColor = f_Color*(le*ka + le*kd*max(dot(l, n), 0.0) + le*ks*pow(max(dot(r,v), 0.0), a));
+			gl_FragColor.a = 1.0;
+		}
+	</script>
+
+	<script type="text/javascript" src="../common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../common/initShaders.js"></script>
+	<script type="text/javascript" src="../common/MV.js"></script>
+	<script type="text/javascript" src="graphics.js"></script>
+	
+</head>
+
+<body>
+	
+	<canvas id="webgl" width="512" height="512">
+		Your browser does not support webgl
+	</canvas>
+	
+	<input type="range" min="0" max="100" value="50" class="slider" id="pitch">Pitch
+	<input type="range" min="0" max="100" value="50" class="slider" id="roll">Roll
+	<input type="range" min="0" max="100" value="50" class="slider" id="yaw">Yaw
+	
+
+</body>
+
+</html>
