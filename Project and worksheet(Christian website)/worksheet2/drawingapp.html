@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="drawingapp.css">
+
+	<script id="vertex-shader" type="x-shader/x-vertex">
+		precision mediump float;
+	
+		attribute vec4 vPosition;
+		attribute vec4 vColor;
+		varying vec4 fColor;
+		
+		void main(){
+			gl_PointSize = 20.0;
+			gl_Position = vPosition;
+			fColor = vColor;
+		}
+	</script>
+	
+	<script id="fragment-shader" type="x-shader/x-fragment">
+		precision mediump float;
+		
+		varying vec4 fColor;
+		
+		void main()
+		{	
+			//gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+			
+			gl_FragColor = fColor;
+		}
+	</script>
+
+	<script type="text/javascript" src="../common/webgl-utils.js"></script>
+	<script type="text/javascript" src="../common/initShaders.js"></script>
+	<script type="text/javascript" src="../common/MV.js"></script>
+	<script type="text/javascript" src="graphics.js"></script>
+	
+</head>
+
+<body>
+
+	<!--
+	<div class="dropdown">
+	  <button class="dropbtn">Dropdown</button>
+	  <div class="dropdown-content">
+		<a href="#">Link 1</a>
+		<a href="#">Link 2</a>
+		<a href="#">Link 3</a>
+	  </div>
+	</div>-->
+	
+	Drawing mode: 
+	<select id = "selector">
+		<option value="point">Point</option>
+		<option value="triangle">Triangle</option>
+		<option value="circle">Circle</option>
+	</select>
+	
+	<canvas id="webgl" width="512" height="512">
+		Your browser does not support webgl
+	</canvas>
+	
+	<input id="clear" type="button" value="Clear Canvas"></input>
+	
+	R <input id="rslide" type="range" min="0" max="1" step="0.05" value="0"/>
+	G <input id="gslide" type="range" min="0" max="1" step="0.05" value="0"/>
+	B <input id="bslide" type="range" min="0" max="1" step="0.05" value="0"/>
+
+</body>
+
+</html>
